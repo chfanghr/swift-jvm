@@ -26,8 +26,14 @@ let package = Package(
             name: "JVM",
             dependencies: [
                 .product(name: "ArgumentParser", package: "swift-argument-parser"),
+                .target(name: "Classpath")
             ]
         ),
+        .target(name: "Classpath",
+                dependencies: [
+                    .product(name: "Files", package: "Files"),
+                    .product(name: "Zip", package: "Zip")
+                ]),
         .target(
             name: "java",
             dependencies: [

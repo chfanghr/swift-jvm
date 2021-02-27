@@ -18,6 +18,8 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/apple/swift-argument-parser", .upToNextMinor(from: "0.3.0")),
+        .package(url: "https://github.com/JohnSundell/Files", from: "4.0.0"),
+        .package(url: "https://github.com/marmelroy/Zip", .upToNextMinor(from: "2.1.0")),
     ],
     targets: [
         .target(

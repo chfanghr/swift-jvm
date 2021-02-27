@@ -6,17 +6,17 @@
 //
 
 import Foundation
-import os
+@_exported import Logging
 
 public class SharedLogger{
     private let loggerStorage: BoxImmutable<Logger>
     
-    public init(subsystem: String, category: String){
-        loggerStorage = BoxImmutable(Logger(subsystem: subsystem, category: category))
+    public init(label: String, factory: (String) -> LogHandler){
+        loggerStorage = BoxImmutable(Logger(label: label, factory: factory))
     }
     
-    public init(){
-        loggerStorage = BoxImmutable(Logger())
+    public init(label: String){
+        loggerStorage = BoxImmutable(Logger(label: label))
     }
     
     public var logger: Logger{

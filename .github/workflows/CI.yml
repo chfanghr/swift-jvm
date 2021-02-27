@@ -1,0 +1,23 @@
+name: CI
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs: 
+  build-and-test:
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v2
+      - uses: sersoft-gmbh/SwiftyActions@v1
+        with: 
+          release-version: 5.3
+      - name: Build(debug) 
+        run: swift build -c debug --enable-test-discovery
+      - name: Build(release)
+        run: swift build -c release --enable-test-discovery
+      - name: Run Package Tests
+        run: swift test -c debug --enable-test-discovery

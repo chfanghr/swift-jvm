@@ -6,16 +6,21 @@
 //
 
 import Foundation
+import Classpath
 
 public class JVM {
+    let classpath: Classpath
     let verboseMode: Bool
 
     public init(jreOption: String, cpOption: String, verboseMode: Bool = false) {
         self.verboseMode = verboseMode
+        classpath = measure(Classpath(jreOption: jreOption, cpOption: cpOption), name: "unpack classes")
     }
 
     public func start(mainClass: String, args: [String]) throws {
         print("main class: \(mainClass) args: \(args)")
+        let mainClassData = measure(classpath[mainClass], name: "find main class")
+        print("main class data: \(mainClassData!)")
     }
 }
 

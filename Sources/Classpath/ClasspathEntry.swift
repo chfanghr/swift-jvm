@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import Utilities
 
 public let pathListSeparator = ":"
 
@@ -13,20 +14,28 @@ public protocol ClasspathEntry: AnyObject, CustomStringConvertible {
     func readClass(name: String) throws -> (Data, ClasspathEntry)
 }
 
-internal func createClasspathEntry(from path: String) -> ClasspathEntry? {
+internal func createClasspathEntry(with logger: Logger, from path: String) -> ClasspathEntry? {
     if path.contains(pathListSeparator) {
-        return CompositeEntry(pathList: path)
+        return CompositeEntry(with: logger, pathList: path)
     }
 
     if path.hasSuffix("*") {
-        return WildcardEntry(path: path)
+        return WildcardEntry(with: logger, path: path)
     }
 
     if path.hasSuffix(".jar") || path.hasSuffix("jar".uppercased()) ||
         path.hasSuffix(".zip") || path.hasSuffix("zip".uppercased())
     {
-        return ZipEntry(path: path)
+        return ZipEntry(with: logger, path: path)
     }
 
-    return DirEntry(path: path)
+    return DirEntry(with: logger, path: path)
+}
+
+public class ClasspathEntryBase{
+    internal let logger: Logger
+    
+    public init(with logger: Logger){
+        self.logger = logger
+    }
 }

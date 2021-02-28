@@ -6,17 +6,21 @@
 //
 
 import Foundation
+import Utilities
+import JVMError
 
-public struct ClassNotFoundError: Error {}
-
-public class CompositeEntry {
+public class CompositeEntry: ClasspathEntryBase {
     public var entries: [ClasspathEntry] = []
 
-    public init() {}
-
-    public init?(pathList: String) {
+    public override init(with logger: Logger){
+        super.init(with: logger)
+    }
+    
+    public init?(with logger: Logger, pathList: String) {
+        super.init(with: logger)
+        
         for path in pathList.split(separator: Character(pathListSeparator)) {
-            guard let entry = createClasspathEntry(from: String(path)) else {
+            guard let entry = createClasspathEntry(with: logger, from: String(path)) else {
                 return nil
             }
             entries.append(entry)
@@ -32,7 +36,7 @@ extension CompositeEntry: ClasspathEntry {
                 return (data, self)
             }
         }
-        throw ClassNotFoundError()
+        throw JVMError.ReflectiveOperationError.ClassNotFoundError(desiredClass: name)
     }
 
     public var description: String {

@@ -21,8 +21,9 @@ let package = Package(
         .package(url: "https://github.com/apple/swift-argument-parser", .upToNextMinor(from: "0.3.0")),
         .package(url: "https://github.com/JohnSundell/Files", from: "4.0.0"),
         .package(url: "https://github.com/marmelroy/Zip", .upToNextMinor(from: "2.1.0")),
-        .package(url: "https://github.com/tsolomko/BitByteData.git", from: "1.4.0"),
-        .package(url: "https://github.com/apple/swift-log.git", from: "1.4.1"),
+        .package(url: "https://github.com/tsolomko/BitByteData", from: "1.4.0"),
+        .package(url: "https://github.com/apple/swift-log", from: "1.4.1"),
+        .package(url: "https://github.com/luoxiu/LogDog", from: "0.2.0"),
     ],
     targets: [
         .target(
@@ -58,6 +59,7 @@ let package = Package(
             name: "java",
             dependencies: [
                 .target(name: "JVM"),
+                .product(name: "LogDog", package: "LogDog"),
             ]
         ),
         .target(

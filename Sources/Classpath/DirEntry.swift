@@ -7,29 +7,35 @@
 
 import Files
 import Foundation
+import Utilities
+import JVMError
 
-public class DirEntry {
+public class DirEntry: ClasspathEntryBase{
     public let folder: Folder
 
-    public init?(path: String) {
+    public init?(with logger: Logger, path: String) {
         guard let folder = try? Folder(path: path) else {
             return nil
         }
         self.folder = folder
+        super.init(with: logger)
     }
 
-    internal init?(url: URL) {
+    internal init?(with logger: Logger, url: URL) {
         guard let folder = try? Folder(path: url.path) else {
             return nil
         }
         self.folder = folder
+        super.init(with: logger)
     }
 }
 
 extension DirEntry: ClasspathEntry {
     public func readClass(name: String) throws -> (Data, ClasspathEntry) {
-        let file = try folder.file(named: name)
-        let data = try file.read()
+        guard let file = try? folder.file(named: name),
+              let data = try? file.read() else{
+            throw JVMError.ReflectiveOperationError.ClassNotFoundError(desiredClass: name)
+        }
         return (data, self)
     }
 

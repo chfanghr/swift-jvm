@@ -69,10 +69,8 @@ public class JVM {
                 "args": .stringConvertible(args)
             ])
             logger.info("looking for main class")
-            guard let mainClassData = measure(with: logger, name: "looking for main class",
-                                              classpath[mainClass]) else{
-                throw JVMError.ReflectiveOperationError.ClassNotFoundError(desiredClass: mainClass)
-            }
+            let (mainClassData, _) = try measure(with: logger, name: "looking for main class",
+                                            classpath.readClass(name: mainClass))
             logger.info("main class look up successfully", metadata: [
                 "mainClassData": .stringConvertible(mainClassData)
             ])

@@ -8,8 +8,10 @@
 import Files
 import Foundation
 import Zip
+import Utilities
+import JVMError
 
-public class ZipEntry {
+public class ZipEntry: ClasspathEntryBase {
     public let path: String
     private let dir: Folder
 
@@ -22,7 +24,7 @@ public class ZipEntry {
         return newTmpFolder.url
     }
 
-    public init?(path: String) {
+    public init?(with logger: Logger, path: String) {
         if Self.firstTime {
             Zip.addCustomFileExtension("jar")
             Zip.addCustomFileExtension("jar".uppercased())
@@ -39,6 +41,7 @@ public class ZipEntry {
 
         self.path = path
         dir = tmpDir
+        super.init(with: logger)
     }
 
     deinit {
@@ -48,8 +51,10 @@ public class ZipEntry {
 
 extension ZipEntry: ClasspathEntry {
     public func readClass(name: String) throws -> (Data, ClasspathEntry) {
-        let file = try dir.file(named: name)
-        let data = try file.read()
+        guard let file = try? dir.file(named: name),
+              let data = try? file.read() else{
+            throw JVMError.ReflectiveOperationError.ClassNotFoundError(desiredClass: name)
+        }
         return (data, self)
     }
 

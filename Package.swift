@@ -30,7 +30,8 @@ let package = Package(
             dependencies: [
                 .product(name: "ArgumentParser", package: "swift-argument-parser"),
                 .target(name: "Classpath"),
-                .target(name: "JVMError")
+                .target(name: "JVMError"),
+                .target(name: "Utilities")
             ]),
         .target(
             name: "ClassFile",
@@ -44,10 +45,14 @@ let package = Package(
             dependencies: [
                 .product(name: "Files", package: "Files"),
                 .product(name: "Zip", package: "Zip"),
-                .target(name: "JVMError")
+                .target(name: "JVMError"),
+                .target(name: "Utilities")
             ]),
         .target(
-            name: "JVMError"
+            name: "JVMError",
+            dependencies: [
+                .target(name: "Utilities")
+            ]
         ),
         .target(
             name: "java",

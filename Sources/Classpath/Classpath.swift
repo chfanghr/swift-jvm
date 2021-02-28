@@ -7,13 +7,14 @@
 
 import Files
 import Foundation
+import Utilities
 
 public struct Classpath {
     public let bootClasspath: ClasspathEntry?
     public let extClasspath: ClasspathEntry?
     public let userClasspath: ClasspathEntry?
 
-    public init(jreOption: String = "", cpOption: String = "") {
+    public init(with logger: Logger, jreOption: String = "", cpOption: String = "") throws {
         let jreDir = Self.getJreDir(jreOption: jreOption)
 
         let jreLibPath = URL(fileURLWithPath: jreDir)

@@ -44,8 +44,9 @@ public struct JavaCommand: ParsableCommand {
     public var args: [String] = []
 
     public mutating func run() throws {
-        let jvm = JVM(jreOption: jreOption, cpOption: classPath)
-        try jvm.start(mainClass: self.class, args: args)
+        let jvm = JVM(jreOption: jreOption, cpOption: classPath, verboseMode: verboseMode)
+        precondition(jvm != nil, "jvm initialization failure")
+        try jvm!.start(mainClass: self.class, args: args)
     }
 
     public init() {}

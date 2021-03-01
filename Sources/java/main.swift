@@ -9,4 +9,3 @@ import Foundation
 import JVM
 
 JavaCommand.main()
-

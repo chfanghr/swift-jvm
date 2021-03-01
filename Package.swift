@@ -15,7 +15,8 @@ let package = Package(
         ),
         .executable(
             name: "java",
-            targets: ["java"]),
+            targets: ["java"]
+        ),
     ],
     dependencies: [
         .package(url: "https://github.com/apple/swift-argument-parser", .upToNextMinor(from: "0.3.0")),
@@ -31,27 +32,30 @@ let package = Package(
                 .product(name: "ArgumentParser", package: "swift-argument-parser"),
                 .target(name: "Classpath"),
                 .target(name: "JVMError"),
-                .target(name: "Utilities")
-            ]),
+                .target(name: "Utilities"),
+            ]
+        ),
         .target(
             name: "ClassFile",
             dependencies: [
                 .product(name: "BitByteData", package: "BitByteData"),
                 .target(name: "JVMError"),
-                .target(name: "Utilities")
-            ]),
+                .target(name: "Utilities"),
+            ]
+        ),
         .target(
             name: "Classpath",
             dependencies: [
                 .product(name: "Files", package: "Files"),
                 .product(name: "Zip", package: "Zip"),
                 .target(name: "JVMError"),
-                .target(name: "Utilities")
-            ]),
+                .target(name: "Utilities"),
+            ]
+        ),
         .target(
             name: "JVMError",
             dependencies: [
-                .target(name: "Utilities")
+                .target(name: "Utilities"),
             ]
         ),
         .target(
@@ -62,8 +66,8 @@ let package = Package(
         ),
         .target(
             name: "Utilities",
-            dependencies:[
-                .product(name: "Logging", package: "swift-log")
+            dependencies: [
+                .product(name: "Logging", package: "swift-log"),
             ]
         ),
         .testTarget(

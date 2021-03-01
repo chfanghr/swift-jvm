@@ -7,9 +7,9 @@
 
 import Files
 import Foundation
-import Zip
-import Utilities
 import JVMError
+import Utilities
+import Zip
 
 public class ZipEntry: ClasspathEntryBase {
     public let path: String
@@ -37,13 +37,13 @@ public class ZipEntry: ClasspathEntryBase {
               let tmpDir = try? Folder(path: tmpUrl.path)
         else {
             logger.warning("failed to deceompress zip class", metadata: [
-                "path": .string(path)
+                "path": .string(path),
             ])
             return nil
         }
 
         logger.info("decompress succeeded", metadata: [
-            "tmpDir": .stringConvertible(tmpDir)
+            "tmpDir": .stringConvertible(tmpDir),
         ])
         self.path = path
         dir = tmpDir
@@ -52,7 +52,7 @@ public class ZipEntry: ClasspathEntryBase {
 
     deinit {
         logger.info("deleting decompressed class", metadata: [
-            "tmpDir": .stringConvertible(dir)
+            "tmpDir": .stringConvertible(dir),
         ])
         try! dir.delete()
     }
@@ -61,10 +61,11 @@ public class ZipEntry: ClasspathEntryBase {
 extension ZipEntry: ClasspathEntry {
     public func readClass(name: String) throws -> (Data, ClasspathEntry) {
         guard let file = try? dir.file(named: name),
-              let data = try? file.read() else{
+              let data = try? file.read()
+        else {
             logger.warning("failed to read class", metadata: [
                 "tmpDir": .stringConvertible(dir),
-                "name": .string(name)
+                "name": .string(name),
             ])
             throw JVMError.ReflectiveOperationError.ClassNotFoundError(desiredClass: name)
         }

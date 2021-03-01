@@ -6,29 +6,29 @@
 //
 
 import Foundation
-import Utilities
 import JVMError
+import Utilities
 
 public class CompositeEntry: ClasspathEntryBase {
     public var entries: [ClasspathEntry] = []
 
-    public override init(with logger: Logger){
+    override public init(with logger: Logger) {
         super.init(with: logger)
     }
-    
+
     public init?(with logger: Logger, pathList: String) {
         super.init(with: logger)
-        
+
         for path in pathList.split(separator: Character(pathListSeparator)) {
             if let entry = createClasspathEntry(with: logger, from: String(path)) {
                 logger.info("adding entry", metadata: [
-                    "entry": .stringConvertible(entry)
+                    "entry": .stringConvertible(entry),
                 ])
                 entries.append(entry)
                 continue
             }
             logger.warning("failed to create entry", metadata: [
-                "path": .stringConvertible(path)
+                "path": .stringConvertible(path),
             ])
         }
     }
@@ -37,7 +37,7 @@ public class CompositeEntry: ClasspathEntryBase {
 extension CompositeEntry: ClasspathEntry {
     public func readClass(name: String) throws -> (Data, ClasspathEntry) {
         logger.info("looking for class", metadata: [
-            "name": .string(name)
+            "name": .string(name),
         ])
         for entry in entries {
             if let res = try? entry.readClass(name: name) {
@@ -45,7 +45,7 @@ extension CompositeEntry: ClasspathEntry {
                 return (data, self)
             }
             logger.info("class not found", metadata: [
-                "entry": .stringConvertible(entry)
+                "entry": .stringConvertible(entry),
             ])
         }
         throw JVMError.ReflectiveOperationError.ClassNotFoundError(desiredClass: name)
@@ -53,7 +53,7 @@ extension CompositeEntry: ClasspathEntry {
 
     public var description: String {
         entries
-            .map { $0.description }
+            .map(\.description)
             .joined(separator: pathListSeparator)
     }
 }

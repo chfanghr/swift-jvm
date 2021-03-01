@@ -15,11 +15,11 @@ public class WildcardEntry: CompositeEntry {
 
         let baseDirPath = String(path.dropLast())
         logger.info("detecting jar files in base path", metadata: [
-            "baseDirPath": .string(baseDirPath)
+            "baseDirPath": .string(baseDirPath),
         ])
         guard let baseDir = try? Folder(path: baseDirPath) else {
             logger.warning("base path does not exist or cannot access", metadata: [
-                "baseDirPath": .string(baseDirPath)
+                "baseDirPath": .string(baseDirPath),
             ])
             return nil
         }
@@ -27,9 +27,9 @@ public class WildcardEntry: CompositeEntry {
             let path = file.path
             if path.hasSuffix(".jar") || path.hasSuffix("jar".uppercased()) {
                 logger.info("decompressing jar file", metadata: [
-                    "filePath": .string(path)
+                    "filePath": .string(path),
                 ])
-                if let zipEntry = ZipEntry(with: logger,path: path) {
+                if let zipEntry = ZipEntry(with: logger, path: path) {
                     entries.append(zipEntry)
                 }
             }

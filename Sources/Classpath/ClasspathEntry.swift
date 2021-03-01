@@ -16,7 +16,7 @@ public protocol ClasspathEntry: AnyObject, CustomStringConvertible {
 
 internal func createClasspathEntry(with logger: Logger, from path: String) -> ClasspathEntry? {
     logger.info("creating classpath entry", metadata: [
-        "path": .string(path)
+        "path": .string(path),
     ])
     if path.contains(pathListSeparator) {
         logger.info("creating composite entry")
@@ -39,10 +39,10 @@ internal func createClasspathEntry(with logger: Logger, from path: String) -> Cl
     return DirEntry(with: logger, path: path)
 }
 
-public class ClasspathEntryBase{
+public class ClasspathEntryBase {
     internal let logger: Logger
-    
-    public init(with logger: Logger){
+
+    public init(with logger: Logger) {
         self.logger = logger
     }
 }

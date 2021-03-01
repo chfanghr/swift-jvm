@@ -7,29 +7,46 @@
 
 import Files
 import Foundation
+import JVMError
+import Utilities
 
-public class DirEntry {
+public class DirEntry: ClasspathEntryBase {
     public let folder: Folder
 
-    public init?(path: String) {
+    public init?(with logger: Logger, path: String) {
         guard let folder = try? Folder(path: path) else {
+            logger.warning("cannot create directory entry", metadata: [
+                "path": .stringConvertible(path),
+            ])
             return nil
         }
         self.folder = folder
+        super.init(with: logger)
     }
 
-    internal init?(url: URL) {
+    internal init?(with logger: Logger, url: URL) {
         guard let folder = try? Folder(path: url.path) else {
+            logger.warning("cannot create directory entry", metadata: [
+                "url": .stringConvertible(url),
+            ])
             return nil
         }
         self.folder = folder
+        super.init(with: logger)
     }
 }
 
 extension DirEntry: ClasspathEntry {
     public func readClass(name: String) throws -> (Data, ClasspathEntry) {
-        let file = try folder.file(named: name)
-        let data = try file.read()
+        guard let file = try? folder.file(named: name),
+              let data = try? file.read()
+        else {
+            logger.warning("cannot read class from directory entry", metadata: [
+                "folder": .stringConvertible(folder),
+                "name": .string(name),
+            ])
+            throw JVMError.ReflectiveOperationError.ClassNotFoundError(desiredClass: name)
+        }
         return (data, self)
     }
 

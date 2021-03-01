@@ -5,43 +5,88 @@
 //  Created by 方泓睿 on 2021/2/24.
 //
 
-import Foundation
 import Classpath
+import Foundation
+@_exported import JVMError
+import Utilities
 
 public class JVM {
-    let classpath: Classpath
-    let verboseMode: Bool
+    public static var virtualMachines: [JVM] = []
 
-    public init(jreOption: String, cpOption: String, verboseMode: Bool = false) {
+    private(set) var classpathStorage: Classpath?
+    public var classpath: Classpath {
+        guard let classpath = classpathStorage else {
+            preconditionFailure()
+        }
+        return classpath
+    }
+
+    public var verboseMode: Bool {
+        didSet {
+            logger.logLevel = verboseMode ? .debug : .warning
+            logger.info("verbose mode enabled")
+        }
+    }
+
+    public let identifier: UUID
+    private var logger: Logger
+    public var id: UUID {
+        identifier
+    }
+
+    public init?(jreOption: String, cpOption: String, verboseMode: Bool = false, vmIdentifier: UUID = UUID()) {
+        identifier = vmIdentifier
+        logger = Logger(label: "jvm")
+        logger[metadataKey: "id"] = .stringConvertible(identifier)
         self.verboseMode = verboseMode
-        classpath = measure(Classpath(jreOption: jreOption, cpOption: cpOption), name: "unpack classes")
+        logger.logLevel = verboseMode ? .debug : .warning
+
+        logger.info("booting jvm", metadata: [
+            "jreOption": .string(jreOption),
+            "cpOption": .string(cpOption),
+        ])
+
+        do {
+            classpathStorage = try measure(with: logger, name: "setting up classpath",
+                                           Classpath(with: logger, jreOption: jreOption, cpOption: cpOption))
+            logger.info("classpath setup succeeded", metadata: [
+                "classpath": .stringConvertible(classpath),
+            ])
+        } catch {
+            logger.critical("crashed due to classpath setup failure", metadata: [
+                "error": .string(String(describing: error)),
+            ])
+            return nil
+        }
+    }
+
+    deinit {
+        logger.info("exit")
     }
 
     public func start(mainClass: String, args: [String]) throws {
-        print("main class: \(mainClass) args: \(args)")
-        let mainClassData = measure(classpath[mainClass], name: "find main class")
-        print("main class data: \(mainClassData!)")
-    }
-}
-
-internal func measure<T>(_ job: @autoclosure () throws -> T, name: String = "") rethrows -> T {
-    let begin = DispatchTime.now()
-    let res = try job()
-    let end = DispatchTime.now()
-    let nanoInterval = end.uptimeNanoseconds - begin.uptimeNanoseconds
-    let interval = Double(nanoInterval) / 1_000_000_000
-    print("\(name): \(interval)s")
-    return res
-}
-
-extension Data {
-    struct HexEncodingOptions: OptionSet {
-        let rawValue: Int
-        static let upperCase = HexEncodingOptions(rawValue: 1 << 0)
+        do {
+            logger.info("executing main class", metadata: [
+                "mainClass": .string(mainClass),
+                "args": .stringConvertible(args),
+            ])
+            logger.info("looking for main class")
+            let (mainClassData, _) = try measure(with: logger, name: "looking for main class",
+                                                 classpath.readClass(name: mainClass))
+            logger.info("main class look up successfully", metadata: [
+                "mainClassData": .stringConvertible(mainClassData),
+            ])
+            logger.debug("main class data", metadata: [
+                "data": .string(mainClassData.hexEncodedString()),
+            ])
+        } catch {
+            handleException(error)
+        }
     }
 
-    func hexEncodedString(options: HexEncodingOptions = []) -> String {
-        let format = options.contains(.upperCase) ? "%02hhX" : "%02hhx"
-        return map { String(format: format, $0) }.joined()
+    public func handleException(_ err: Error) {
+        logger.critical("unexpected error or unhandled exception", metadata: [
+            "error": .stringConvertible(String(describing: err)),
+        ])
     }
 }

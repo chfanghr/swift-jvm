@@ -15,20 +15,27 @@ public protocol ClasspathEntry: AnyObject, CustomStringConvertible {
 }
 
 internal func createClasspathEntry(with logger: Logger, from path: String) -> ClasspathEntry? {
+    logger.info("creating classpath entry", metadata: [
+        "path": .string(path)
+    ])
     if path.contains(pathListSeparator) {
+        logger.info("creating composite entry")
         return CompositeEntry(with: logger, pathList: path)
     }
 
     if path.hasSuffix("*") {
+        logger.info("creating wildcard entry")
         return WildcardEntry(with: logger, path: path)
     }
 
     if path.hasSuffix(".jar") || path.hasSuffix("jar".uppercased()) ||
         path.hasSuffix(".zip") || path.hasSuffix("zip".uppercased())
     {
+        logger.info("creating zip entry")
         return ZipEntry(with: logger, path: path)
     }
 
+    logger.info("creating directory entry")
     return DirEntry(with: logger, path: path)
 }
 
